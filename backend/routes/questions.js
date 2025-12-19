@@ -36,6 +36,20 @@ router.get('/', async (req, res) => {
 // GET perguntas agrupadas por categoria
 router.get('/by-category', async (req, res) => {
   try {
+    const limitPerCategory = Number.parseInt(req.query.limit_per_category, 10)
+    const questionsPerCategory = Number.isFinite(limitPerCategory) && limitPerCategory > 0
+      ? limitPerCategory
+      : 3 // 3 por categoria => 18 perguntas no total (6 categorias)
+
+    const shuffleArray = (array) => {
+      const arr = [...array]
+      for (let i = arr.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[arr[i], arr[j]] = [arr[j], arr[i]]
+      }
+      return arr
+    }
+
     const categoriesResult = await pool.query(`
       SELECT id, name, description
       FROM categories
@@ -54,12 +68,20 @@ router.get('/by-category', async (req, res) => {
 
     const categoriesWithQuestions = categoriesResult.rows.map(category => ({
       ...category,
-      questions: questionsResult.rows.filter(q => q.category_id === category.id)
+      questions: (() => {
+        const list = questionsResult.rows.filter(q => q.category_id === category.id)
+        if (list.length <= questionsPerCategory) return list
+        return shuffleArray(list).slice(0, questionsPerCategory)
+      })()
     }));
 
     res.json({
       success: true,
-      data: categoriesWithQuestions
+      data: categoriesWithQuestions,
+      meta: {
+        questions_per_category: questionsPerCategory,
+        total_questions: categoriesWithQuestions.reduce((sum, cat) => sum + cat.questions.length, 0)
+      }
     });
   } catch (error) {
     console.error('Erro ao buscar perguntas por categoria:', error);
