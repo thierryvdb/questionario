@@ -7,7 +7,7 @@
       <!-- Menu de Navegação -->
       <nav class="main-nav">
         <button
-          @click="currentView = 'questionnaire'"
+          @click="goToNewAssessment"
           :class="['nav-btn', { active: currentView === 'questionnaire' }]"
         >
           📝 Novo Questionário
@@ -134,6 +134,7 @@ export default {
   },
   setup() {
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+    const QUESTIONS_PER_CATEGORY = 6
 
     const currentView = ref('questionnaire')
     const categories = ref([])
@@ -158,8 +159,13 @@ export default {
       loading.value = true
       error.value = null
 
+      scores.value = {}
+      categories.value = []
+
       try {
-        const response = await axios.get(`${API_URL}/questions/by-category`)
+        const response = await axios.get(`${API_URL}/questions/by-category`, {
+          params: { limit_per_category: QUESTIONS_PER_CATEGORY }
+        })
         categories.value = response.data.data
       } catch (err) {
         error.value = 'Erro ao carregar perguntas. Verifique se o servidor está rodando.'
@@ -207,6 +213,7 @@ export default {
       scores.value = {}
       userName.value = ''
       userEmail.value = ''
+      loadQuestions()
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 

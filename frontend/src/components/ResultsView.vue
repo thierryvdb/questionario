@@ -99,14 +99,14 @@
         </div>
       </div>
 
-<!--      <div class="recommendations-card" v-if="analysis.insights.recommendations.length > 0">
+      <div class="recommendations-card" v-if="analysis.insights.recommendations.length > 0">
         <h3>💡 Recomendações</h3>
         <ul>
           <li v-for="(recommendation, index) in analysis.insights.recommendations" :key="index">
             {{ recommendation }}
           </li>
         </ul>
-        </div> -->
+        </div> 
     </div>
 
     <div class="actions-section">

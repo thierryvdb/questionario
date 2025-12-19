@@ -39,7 +39,7 @@ router.get('/by-category', async (req, res) => {
     const limitPerCategory = Number.parseInt(req.query.limit_per_category, 10)
     const questionsPerCategory = Number.isFinite(limitPerCategory) && limitPerCategory > 0
       ? limitPerCategory
-      : 3 // 3 por categoria => 18 perguntas no total (6 categorias)
+      : 3 // 6 por categoria => 36 perguntas no total (6 categorias)
 
     const shuffleArray = (array) => {
       const arr = [...array]
